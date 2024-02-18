@@ -1,0 +1,12 @@
+D:\WorkSpace\Tasks\InfrastractureImplemention\BackEndInfrsastructure\bin\Debug\net8.0\BackEndInfrastructure.deps.json
+D:\WorkSpace\Tasks\InfrastractureImplemention\BackEndInfrsastructure\bin\Debug\net8.0\BackEndInfrastructure.dll
+D:\WorkSpace\Tasks\InfrastractureImplemention\BackEndInfrsastructure\bin\Debug\net8.0\BackEndInfrastructure.pdb
+D:\WorkSpace\Tasks\InfrastractureImplemention\BackEndInfrsastructure\obj\Debug\net8.0\BackEndInfrastructure.csproj.AssemblyReference.cache
+D:\WorkSpace\Tasks\InfrastractureImplemention\BackEndInfrsastructure\obj\Debug\net8.0\BackEndInfrastructure.GeneratedMSBuildEditorConfig.editorconfig
+D:\WorkSpace\Tasks\InfrastractureImplemention\BackEndInfrsastructure\obj\Debug\net8.0\BackEndInfrastructure.AssemblyInfoInputs.cache
+D:\WorkSpace\Tasks\InfrastractureImplemention\BackEndInfrsastructure\obj\Debug\net8.0\BackEndInfrastructure.AssemblyInfo.cs
+D:\WorkSpace\Tasks\InfrastractureImplemention\BackEndInfrsastructure\obj\Debug\net8.0\BackEndInfrastructure.csproj.CoreCompileInputs.cache
+D:\WorkSpace\Tasks\InfrastractureImplemention\BackEndInfrsastructure\obj\Debug\net8.0\BackEndInfrastructure.dll
+D:\WorkSpace\Tasks\InfrastractureImplemention\BackEndInfrsastructure\obj\Debug\net8.0\refint\BackEndInfrastructure.dll
+D:\WorkSpace\Tasks\InfrastractureImplemention\BackEndInfrsastructure\obj\Debug\net8.0\BackEndInfrastructure.pdb
+D:\WorkSpace\Tasks\InfrastractureImplemention\BackEndInfrsastructure\obj\Debug\net8.0\ref\BackEndInfrastructure.dll
