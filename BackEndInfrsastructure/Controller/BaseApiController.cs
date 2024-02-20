@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace BackEndInfrastructure.Controller
 {
-    [Authorize]
+
     public class BaseApiController : ControllerBase
     {
         public string? UserFirstName
