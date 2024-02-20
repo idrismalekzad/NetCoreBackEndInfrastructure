@@ -1,4 +1,5 @@
-﻿using BackEndInfrsastructure.Domain;
+﻿using BackEndInfrastructure.DynamicLinqCore;
+using BackEndInfrsastructure.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,7 @@ namespace BackEndInfrastructure.Infrastructure.Repository
 
 
         Task<IReadOnlyList<ModelItem>> AllItemsAsync();
+        Task<LinqDataResult<ModelItem>> AllItemsAsync(LinqDataRequest request);
 
 
         Task<ModelItem> InsertAsync(ModelItem item);

@@ -1,4 +1,5 @@
-﻿using BackEndInfrsastructure.Domain;
+﻿using BackEndInfrastructure.DynamicLinqCore;
+using BackEndInfrsastructure.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -23,9 +24,22 @@ namespace BackEndInfrastructure.Infrastructure.Repository
             _entity = _dbContext.Set<DomainModelEntity>();
 
         }
+        /// <summary>
+        /// Get All ITems Of DomainModelEntity IN IReadOnlyList Type 
+        /// </summary>
+        /// <returns></returns>
         public async Task<IReadOnlyList<DomainModelEntity>> AllItemsAsync()
         {
             return await _entity.ToListAsync();
+        }
+
+        /// <summary>
+        /// Get All ITems Of DomainModelEntity IN IEnumerable Type With Handling Paging - Sorting - Filter
+        /// </summary>
+        /// <returns></returns>
+        public virtual async Task<LinqDataResult<DomainModelEntity>> AllItemsAsync(LinqDataRequest request)
+        {
+            return await _dbContext.Set<DBModelEntity>().ToLinqDataResultAsync<DomainModelEntity>(request.Take, request.Skip, request.Sort, request.Filter);
         }
 
         public virtual async Task DeleteAsync(DomainModelEntity item)
