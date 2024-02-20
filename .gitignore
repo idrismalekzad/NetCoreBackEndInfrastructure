@@ -4,3 +4,5 @@
 
 /BackEndInfrsastructure/obj
 /.vs
+/WebApiExample/bin/Debug/net8.0
+/WebApiExample/obj
