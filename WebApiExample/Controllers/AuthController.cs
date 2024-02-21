@@ -1,9 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using WebApiExample.Services;
+using WebApiExample.Data.Entities;
 
 namespace WebApiExample.Controllers
 {
@@ -11,41 +15,33 @@ namespace WebApiExample.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private const string TokenSecret = "RadinPeymentChannelUserManagementSecurely";
-        private readonly TimeSpan TokenLifeTime = TimeSpan.FromHours(8);
-
-        [HttpPost]
-        public async Task<ActionResult<string>> GenerateToken([FromBody] TokenGenerationRequest request)
+        private readonly IJWTService _jWTService;
+        private readonly UserManager<ApplicationUser> _userManager;
+        public AuthController(IJWTService jWTService, UserManager<ApplicationUser> userManager)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(TokenSecret));
+            _jWTService = jWTService;
+            _userManager = userManager; 
+        }
 
-            var claims = new List<Claim>()
+        [HttpPost("login")]
+        public async Task<ActionResult<string>> Login([FromBody] LoginRequest request)
+        {
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user == null || !await _userManager.CheckPasswordAsync(user, request.Password))
             {
-                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new(JwtRegisteredClaimNames.Sub, request.Email),
-                new(JwtRegisteredClaimNames.Email, request.Email),
-                new("userid", request.UserID.ToString())
-            };
+                return BadRequest("Invalid username or password");
+            }
 
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Expires = DateTime.UtcNow.Add(TokenLifeTime),
-                Issuer = "https://radin.tech/",
-                Audience = "https://usermangement.channel.com/",
-                SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256)
-            };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var jwt = tokenHandler.WriteToken(token);
-            return Ok(jwt);
+            // Authentication successful, generate JWT
+            var token = await _jWTService.GenerateToken(user);
+            return Ok(token);
         }
     }
 
-    public class TokenGenerationRequest
-    {
-        public string UserID { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
-    }
+    //public class TokenGenerationRequest
+    //{
+    //    public string UserID { get; set; }
+    //    public string Email { get; set; }
+    //    public string Password { get; set; }
+    //}
 }
