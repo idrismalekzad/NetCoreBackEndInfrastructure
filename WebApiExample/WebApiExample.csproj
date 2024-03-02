@@ -10,6 +10,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Services\AuthorizeAttribute.cs" />
+    <Compile Remove="Services\JWTMiddleware.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.2">
@@ -29,6 +34,11 @@
   <ItemGroup>
     <Folder Include="Infrastructure\UnitOfWork\" />
     <Folder Include="Infrastructure\Repositories\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Services\JWT\Middleware\AuthorizeAttribute.cs" />
+    <None Include="Services\JWT\Middleware\JWTMiddleware.cs" />
   </ItemGroup>
 
   <ItemGroup>
