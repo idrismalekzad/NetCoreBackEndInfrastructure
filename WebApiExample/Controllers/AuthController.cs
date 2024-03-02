@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -6,8 +6,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using WebApiExample.Services;
 using WebApiExample.Data.Entities;
+using WebApiExample.Services.JWT;
 
 namespace WebApiExample.Controllers
 {
@@ -34,7 +34,7 @@ namespace WebApiExample.Controllers
 
             // Authentication successful, generate JWT
             var token = await _jWTService.GenerateToken(user);
-            return Ok(token);
+            return Ok(new { Token = token , Reslt = "Successfully Authorized"});
         }
     }
 
