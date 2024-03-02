@@ -8,7 +8,8 @@ using System.Text;
 using WebApiExample.Data;
 using WebApiExample.Data.Entities;
 using WebApiExample.Infrastructure.Initializer;
-using WebApiExample.Services;
+using WebApiExample.Services.JWT;
+using WebApiExample.Services.JWT.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,14 +24,14 @@ builder.Services.AddAuthentication(options =>
 {
     x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
     {
-        ValidIssuer = builder.Configuration["JWTBearerSettings:Issuer"],
-        ValidAudience = builder.Configuration["JWTBearerSettings:Audience"],
+        //ValidIssuer = builder.Configuration["JWTBearerSettings:Issuer"],
+        //ValidAudience = builder.Configuration["JWTBearerSettings:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWTBearerSettings:Key"])),
         ValidateIssuerSigningKey = true,
-        ValidateIssuer = true,
-        ValidateAudience = true,
+        ValidateIssuer = false,
+        ValidateAudience = false,
         ValidateLifetime = true,
-
+        ClockSkew = TimeSpan.Zero
     };
 });
 
@@ -50,7 +51,8 @@ builder.Services.AddSwaggerGen(
             Name = "Authorization",
             In = ParameterLocation.Header,
             Type = SecuritySchemeType.ApiKey,
-            Scheme = "Bearer"
+            Scheme = "Bearer",
+            BearerFormat = "JWT"
         });
 
         c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -104,7 +106,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseMiddleware<JWTMiddleware>();
 app.MapControllers();
 
 app.Run();
