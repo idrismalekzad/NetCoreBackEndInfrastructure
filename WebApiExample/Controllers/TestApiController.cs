@@ -10,11 +10,11 @@ namespace WebApiExample.Controllers
     public class TestApiController : BaseApiController
     {
         [HttpGet]
-        [Authorize]
+        [WebApiExample.Services.JWT.Middleware.Authorize]
         [Route("Get")]
         public async Task<IActionResult> Get()
         {
-            return Ok("Hello World");
+            return Ok("Rerurn Data Successfully");
         }   
     }
 }
