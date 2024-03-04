@@ -1,18 +1,41 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Configuration;
 using System.Reflection;
 using System.Text;
 using WebApiExample.Data;
+using WebApiExample.Data.Configs;
 using WebApiExample.Data.Entities;
 using WebApiExample.Infrastructure.Initializer;
 using WebApiExample.Services.JWT;
 using WebApiExample.Services.JWT.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
+ static string getConnectionStringSQLServer()
+{
+    var environmentName =
+      Environment.GetEnvironmentVariable(
+          "ASPNETCORE_ENVIRONMENT");
 
+    var config = new ConfigurationBuilder().AddJsonFile("appsettings" + (String.IsNullOrWhiteSpace(environmentName) ? "" : "." + environmentName) + ".json", false).Build();
+
+    return config.GetConnectionString("DefaultConnectionSQLServer");
+}
+ static string getConnectionStringOracle()
+{
+    var environmentName =
+      Environment.GetEnvironmentVariable(
+          "ASPNETCORE_ENVIRONMENT");
+
+    var config = new ConfigurationBuilder().AddJsonFile("appsettings" + (String.IsNullOrWhiteSpace(environmentName) ? "" : "." + environmentName) + ".json", false).Build();
+
+    return config.GetConnectionString("DefaultConnectionOracle");
+}
 // Add services to the container.
 
 builder.Services.AddAuthentication(options =>
@@ -75,9 +98,32 @@ builder.Services.AddSwaggerGen(
         });
     });
 
+//Configuration
+
+builder.Services.Configure<ConnectionStringConfig>(builder.Configuration.GetSection("ConnectionStrings"));
+//
 
 // Infrastructure Implemention
-builder.Services.AddDbContext<WebApiDbContext>();
+builder.Services.AddDbContext<WebApiDbContext>((serviceProvider, options) =>
+{
+    var connectionStringConfig = serviceProvider.GetRequiredService<IOptions<ConnectionStringConfig>>();
+
+    if (connectionStringConfig.Value.OracleActivaityStatus == "true")
+    {
+        var connectionString = getConnectionStringOracle();
+        options.UseOracle(connectionString, options =>
+        {
+            options.MigrationsAssembly("Migrations.Oracle");
+        });
+    }
+    else if (connectionStringConfig.Value.SQLServerActivaityStatus == "true")
+    {
+        var connectionString = getConnectionStringSQLServer();
+        options.UseSqlServer(connectionString, options =>
+        options.MigrationsAssembly("Migrations.SQL"));
+    }
+});
+
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<WebApiDbContext>();
 builder.Services.AddScoped<IJWTService, JWTService>();
@@ -92,7 +138,7 @@ using (var scope = app.Services.CreateScope())
     dataContext.Database.Migrate();
 
     var f = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
-    f.Initialize();
+    //f.Initialize();
 }
 
 // Configure the HTTP request pipeline.
