@@ -28,9 +28,16 @@ namespace WebApiExample.Controllers
         [HttpGet("GetAll")]
         public async Task<ActionResult<LinqDataResult<WebServiceUser>>> GetAll()
         {
-            var request = Request.ToLinqDataHttpGetRequest();
-            var res = await _webServiceUserService.ItemsAsync(request);
-            return Ok(res);
+            try
+            {
+                var request = Request.ToLinqDataHttpGetRequest();
+                var res = await _webServiceUserService.ItemsAsync(request);
+                return Ok(res);
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }

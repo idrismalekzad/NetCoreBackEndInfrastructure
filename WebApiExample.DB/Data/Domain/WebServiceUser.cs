@@ -31,7 +31,7 @@ namespace WebApiExample.DB.Data.Domain
 
         public string PROTOCOLNAME { get; set; }
 
-        public bool CARDPRESENT { get; set; }
+        public bool? CARDPRESENT { get; set; }
 
         public bool CVV2CHECK { get; set; }
 

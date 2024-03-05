@@ -1,4 +1,5 @@
 ﻿using BackEndInfrastructure.DynamicLinqCore.Helper;
+using BackEndInfrastructure.Enums;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
 
@@ -18,7 +19,7 @@ namespace BackEndInfrastructure.DynamicLinqCore
         /// <param name="filter">Requested filters.</param>
 
         /// <returns>A LinqDataResult object populated from the processed IQueryable.</returns>
-        public static async Task<LinqDataResult<T>> ToLinqDataResultAsync<T>(this IQueryable<T> queryable, int take, int skip, IEnumerable<Sort> sort, Filter filter)
+        public static async Task<LinqDataResult<T>> ToLinqDataResultAsync<T>(this IQueryable<T> queryable, int take, int skip, IEnumerable<Sort> sort, Filter filter, DataBase dataBase)
         {
             var total = await queryable.CountAsync();
             var filteredCount = total;
@@ -37,15 +38,20 @@ namespace BackEndInfrastructure.DynamicLinqCore
             // Finally page the data
             if (take > 0)
             {
-                queryable = Page(queryable, take, skip);
+                if (dataBase == DataBase.SQLServer)
+                    queryable = PageSQL(queryable, take, skip);
+                if (dataBase == DataBase.Oracle)
+                    queryable = PageOracle(queryable, take, skip);
             }
 
-            return new LinqDataResult<T>
+            var rtn = new LinqDataResult<T>
             {
-                Data = await queryable.ToListAsync(),
+                Data = queryable.AsEnumerable(),
                 RecordsTotal = total,
                 RecordsFiltered = filteredCount,
             };
+
+            return rtn;
         }
 
         /// <summary>
@@ -59,7 +65,7 @@ namespace BackEndInfrastructure.DynamicLinqCore
         /// <param name="filter">Requested filters.</param>
 
         /// <returns>A LinqDataResult object populated from the processed IQueryable.</returns>
-        public static async Task<LinqDataResult<P>> ToLinqDataResultAsync<T, P>(this IQueryable<T> queryable, int take, int skip, IEnumerable<Sort> sort, Filter filter)
+        public static async Task<LinqDataResult<P>> ToLinqDataResultAsync<T, P>(this IQueryable<T> queryable, int take, int skip, IEnumerable<Sort> sort, Filter filter, DataBase dataBase)
             where T : P
         {
             var total = await queryable.CountAsync();
@@ -79,12 +85,15 @@ namespace BackEndInfrastructure.DynamicLinqCore
             // Finally page the data
             if (take > 0)
             {
-                queryable = Page(queryable, take, skip);
+                if (dataBase == DataBase.SQLServer)
+                    queryable = PageSQL(queryable, take, skip);
+                if (dataBase == DataBase.Oracle)
+                    queryable = PageOracle(queryable, take, skip);
             }
 
             return new LinqDataResult<P>
             {
-                Data = (await queryable.ToListAsync()).Cast<P>(),
+                Data = queryable.AsEnumerable().Cast<P>(),
                 RecordsTotal = total,
                 RecordsFiltered = filteredCount,
             };
@@ -127,9 +136,16 @@ namespace BackEndInfrastructure.DynamicLinqCore
             return queryable;
         }
 
-        private static IQueryable<T> Page<T>(IQueryable<T> queryable, int take, int skip)
+        private static IQueryable<T> PageSQL<T>(IQueryable<T> queryable, int take, int skip)
         {
-            return queryable.Skip(skip).Take(take);
+            var rtn = queryable.Skip(skip).Take(take);
+            return rtn;
+        }
+
+        private static IQueryable<T> PageOracle<T>(IQueryable<T> queryable, int take, int skip)
+        {
+            var rtn = queryable.AsEnumerable().Skip(skip).Take(take).AsQueryable();
+            return rtn;
         }
     }
 }

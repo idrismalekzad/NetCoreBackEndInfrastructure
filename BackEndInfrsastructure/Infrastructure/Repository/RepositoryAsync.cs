@@ -1,12 +1,8 @@
 ﻿using BackEndInfrastructure.DynamicLinqCore;
+using BackEndInfrastructure.Enums;
 using BackEndInfrsastructure.Domain;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BackEndInfrastructure.Infrastructure.Repository
 {
@@ -17,12 +13,13 @@ namespace BackEndInfrastructure.Infrastructure.Repository
 
     {
         private readonly DbSet<DBModelEntity> _entity;
+        private readonly DataBase _dataBaseKind;
         private readonly DbContext _dbContext;
-        public RepositoryAsync(DbContext dbContext)
+        public RepositoryAsync(DbContext dbContext, DataBase dataBaseKind)
         {
             _dbContext = dbContext;
             _entity = _dbContext.Set<DBModelEntity>();
-
+            _dataBaseKind = dataBaseKind;
         }
         /// <summary>
         /// Get All ITems Of DomainModelEntity IN IReadOnlyList Type 
@@ -39,7 +36,9 @@ namespace BackEndInfrastructure.Infrastructure.Repository
         /// <returns></returns>
         public virtual async Task<LinqDataResult<DomainModelEntity>> AllItemsAsync(LinqDataRequest request)
         {
-            return await _entity.ToLinqDataResultAsync<DomainModelEntity>(request.Take, request.Skip, request.Sort, request.Filter);
+            var t = _entity.AsEnumerable();
+            var rtn = await ((IQueryable<DomainModelEntity>)_entity).ToLinqDataResultAsync(request.Take, request.Skip, request.Sort, request.Filter, _dataBaseKind);
+            return rtn;
         }
 
         public virtual async Task DeleteAsync(DomainModelEntity item)
@@ -52,10 +51,13 @@ namespace BackEndInfrastructure.Infrastructure.Repository
 
         public virtual Task<DomainModelEntity?> FirstOrDefaultAsync(Expression<Func<DomainModelEntity, bool>> predicate)
         {
-            return _entity.FirstOrDefaultAsync(predicate);
+            return ((IQueryable<DomainModelEntity>)_entity).FirstOrDefaultAsync(predicate);
         }
 
-        public virtual async Task<DomainModelEntity?> GetByIdAsync(PrimaryKeyType id) => await _entity.FindAsync(id);
+        public virtual async Task<DomainModelEntity?> GetByIdAsync(PrimaryKeyType id)
+        {
+            return (DomainModelEntity)(Model<PrimaryKeyType>)(await _entity.FindAsync(id));
+        }
 
         public virtual async Task<DomainModelEntity> InsertAsync(DomainModelEntity item)
         {
@@ -69,9 +71,9 @@ namespace BackEndInfrastructure.Infrastructure.Repository
             }
         }
 
-        public Task UpdateAsync(DomainModelEntity item)
+        public virtual async Task UpdateAsync(DomainModelEntity item)
         {
-            throw new NotImplementedException();
+            _dbContext.Entry(item).State = EntityState.Modified;
         }
     }
 }
