@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -34,8 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Infrastructure\UnitOfWork\" />
-    <Folder Include="Infrastructure\Repositories\" />
+    <Folder Include="Data\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -16,12 +16,12 @@ namespace BackEndInfrastructure.Infrastructure.Repository
        where PrimaryKeyType : struct
 
     {
-        private readonly DbSet<DomainModelEntity> _entity;
+        private readonly DbSet<DBModelEntity> _entity;
         private readonly DbContext _dbContext;
         public RepositoryAsync(DbContext dbContext)
         {
             _dbContext = dbContext;
-            _entity = _dbContext.Set<DomainModelEntity>();
+            _entity = _dbContext.Set<DBModelEntity>();
 
         }
         /// <summary>
@@ -39,7 +39,7 @@ namespace BackEndInfrastructure.Infrastructure.Repository
         /// <returns></returns>
         public virtual async Task<LinqDataResult<DomainModelEntity>> AllItemsAsync(LinqDataRequest request)
         {
-            return await _dbContext.Set<DBModelEntity>().ToLinqDataResultAsync<DomainModelEntity>(request.Take, request.Skip, request.Sort, request.Filter);
+            return await _entity.ToLinqDataResultAsync<DomainModelEntity>(request.Take, request.Skip, request.Sort, request.Filter);
         }
 
         public virtual async Task DeleteAsync(DomainModelEntity item)

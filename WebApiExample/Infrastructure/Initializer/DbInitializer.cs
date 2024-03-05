@@ -10,9 +10,9 @@ namespace WebApiExample.Infrastructure.Initializer
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly WebApiDbContext _dbContext;
+        private readonly WebApiDbContextOracle _dbContext;
 
-        public DbInitializer(WebApiDbContext dbContext,
+        public DbInitializer(WebApiDbContextOracle dbContext,
             UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager)
         {

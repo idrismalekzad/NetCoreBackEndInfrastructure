@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Oracle.ManagedDataAccess.Client;
+using System;
 using System.Configuration;
 using System.Reflection;
 using System.Text;
@@ -12,11 +14,15 @@ using WebApiExample.Data;
 using WebApiExample.Data.Configs;
 using WebApiExample.Data.Entities;
 using WebApiExample.Infrastructure.Initializer;
+using WebApiExample.Infrastructure.UnitOfWork;
+using WebApiExample.Services;
 using WebApiExample.Services.JWT;
 using WebApiExample.Services.JWT.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
- static string getConnectionStringSQLServer()
+
+#region ConnectionStringHelper
+static string getConnectionStringSQLServer()
 {
     var environmentName =
       Environment.GetEnvironmentVariable(
@@ -26,7 +32,7 @@ var builder = WebApplication.CreateBuilder(args);
 
     return config.GetConnectionString("DefaultConnectionSQLServer");
 }
- static string getConnectionStringOracle()
+static string getConnectionStringOracle()
 {
     var environmentName =
       Environment.GetEnvironmentVariable(
@@ -36,8 +42,10 @@ var builder = WebApplication.CreateBuilder(args);
 
     return config.GetConnectionString("DefaultConnectionOracle");
 }
+#endregion
 // Add services to the container.
 
+#region JWT
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -57,6 +65,7 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.Zero
     };
 });
+#endregion
 
 builder.Services.AddAuthorization();
 
@@ -98,34 +107,27 @@ builder.Services.AddSwaggerGen(
         });
     });
 
-//Configuration
+#region OracleRegistration
+builder.Services.AddDbContext<WebApiDbContextOracle>((serviceProvider, options) =>
+{
+   
+});
+#endregion
 
 builder.Services.Configure<ConnectionStringConfig>(builder.Configuration.GetSection("ConnectionStrings"));
-//
 
-// Infrastructure Implemention
-builder.Services.AddDbContext<WebApiDbContext>((serviceProvider, options) =>
+#region SQLServerRegistration
+builder.Services.AddDbContext<WebApiDbContextSQL>((serviceProvider, options) =>
 {
-    var connectionStringConfig = serviceProvider.GetRequiredService<IOptions<ConnectionStringConfig>>();
-
-    if (connectionStringConfig.Value.OracleActivaityStatus == "true")
-    {
-        var connectionString = getConnectionStringOracle();
-        options.UseOracle(connectionString, options =>
-        {
-            options.MigrationsAssembly("Migrations.Oracle");
-        });
-    }
-    else if (connectionStringConfig.Value.SQLServerActivaityStatus == "true")
-    {
-        var connectionString = getConnectionStringSQLServer();
-        options.UseSqlServer(connectionString, options =>
-        options.MigrationsAssembly("Migrations.SQL"));
-    }
+    
 });
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<WebApiDbContext>();
+    .AddEntityFrameworkStores<WebApiDbContextSQL>();
+#endregion
+
+builder.Services.AddScoped<IWebApiUnitOfWorkAsync, WebApiUnitOfWorkAsync>();
+builder.Services.AddScoped<WebServiceUserService, WebServiceUserService>();
 builder.Services.AddScoped<IJWTService, JWTService>();
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 // End Infrastructure Implemention
@@ -134,8 +136,18 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var dataContext = scope.ServiceProvider.GetRequiredService<WebApiDbContext>();
-    dataContext.Database.Migrate();
+    var connectionStringConfig = scope.ServiceProvider.GetRequiredService<IOptions<ConnectionStringConfig>>().Value;
+
+    if (connectionStringConfig.OracleActivaityStatus == "true")
+    {
+        var dataContextoracle = scope.ServiceProvider.GetRequiredService<WebApiDbContextOracle>();
+        dataContextoracle.Database.Migrate();
+    }
+    if (connectionStringConfig.SQLServerActivaityStatus == "true")
+    {
+        var dataContextsql = scope.ServiceProvider.GetRequiredService<WebApiDbContextSQL>();
+        dataContextsql.Database.Migrate();
+    }
 
     var f = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
     //f.Initialize();
@@ -156,3 +168,50 @@ app.UseMiddleware<JWTMiddleware>();
 app.MapControllers();
 
 app.Run();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// void testconnecrtion()
+//{
+//    Console.WriteLine("Starting...");
+
+//    // Replace with your actual connection string
+//    using (var _db = new OracleConnection("User Id=hswitch;Password=hswitch;Data Source=10.9.12.40:1521/odb;"))
+//    {
+//        try
+//        {
+//            Console.WriteLine("Opening connection...");
+//            _db.Open();
+//            Console.WriteLine("Connected successfully!");
+
+//            // Retrieve server version (optional)
+//            var serverVersion = _db.ServerVersion;
+//            Console.WriteLine($"Server version: {serverVersion}");
+//        }
+//        catch (Exception ex)
+//        {
+//            Console.WriteLine($"Error: {ex.Message}");
+//        }
+//    }
+
+//    Console.WriteLine("Press any key to exit...");
+//}
+
+//testconnecrtion();
