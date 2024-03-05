@@ -16,3 +16,4 @@
 /Migrations.Oracle/obj
 /Migrations.SQL/obj
 /WebApiExample.DB/obj
+/WebApiExample/appsettings.Development.json
