@@ -13,6 +13,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Migrations.Oracle", "Migrat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApiExample.DB", "WebApiExample.DB\WebApiExample.DB.csproj", "{E1415472-6420-415F-847D-F59A629265D8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A0304302-FE74-40F0-8508-54BB5823664B}"
+	ProjectSection(SolutionItems) = preProject
+		Aws-Task-Defination.json = Aws-Task-Defination.json
+		.github\workflows\aws.yml = .github\workflows\aws.yml
+		.github\workflows\codeql.yml = .github\workflows\codeql.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
