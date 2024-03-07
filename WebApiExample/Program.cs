@@ -141,12 +141,12 @@ using (var scope = app.Services.CreateScope())
     if (connectionStringConfig.OracleActivaityStatus == "true")
     {
         var dataContextoracle = scope.ServiceProvider.GetRequiredService<WebApiDbContextOracle>();
-        dataContextoracle.Database.Migrate();
+        //dataContextoracle.Database.Migrate();
     }
     if (connectionStringConfig.SQLServerActivaityStatus == "true")
     {
         var dataContextsql = scope.ServiceProvider.GetRequiredService<WebApiDbContextSQL>();
-        dataContextsql.Database.Migrate();
+        //dataContextsql.Database.Migrate();
     }
 
     var f = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
