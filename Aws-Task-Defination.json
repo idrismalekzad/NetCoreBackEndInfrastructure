@@ -20,10 +20,10 @@
       "environment": [],
       "mountPoints": [],
       "volumesFrom": [],
-      "systemControls": [],
-      "executionRoleArn": "arn:aws:iam::446866152498:role/NetCoreInfrastructureElasticContainerServcie"
+      "systemControls": []
     }
   ],
+  "executionRoleArn": "arn:aws:iam::446866152498:role/NetCoreInfrastructureElasticContainerServcie",
   "family": "sample-fargate",
   "networkMode": "awsvpc",
   "revision": 1,
