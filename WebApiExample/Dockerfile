@@ -7,17 +7,19 @@ EXPOSE 8080
 EXPOSE 8081
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["WebApiExample/WebApiExample.csproj", "WebApiExample/"]
-RUN dotnet restore "./WebApiExample/./WebApiExample.csproj"
+COPY ["BackEndInfrsastructure/BackEndInfrastructure.csproj", "BackEndInfrsastructure/"]
+COPY ["Migrations.Oracle/Migrations.Oracle.csproj", "Migrations.Oracle/"]
+COPY ["WebApiExample.DB/WebApiExample.DB.csproj", "WebApiExample.DB/"]
+COPY ["Migrations.SQL/Migrations.SQL.csproj", "Migrations.SQL/"]
+RUN dotnet restore "WebApiExample/WebApiExample.csproj"
 COPY . .
 WORKDIR "/src/WebApiExample"
-RUN dotnet build "./WebApiExample.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "WebApiExample.csproj" -c Release -o /app/build
 
 FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./WebApiExample.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "WebApiExample.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
